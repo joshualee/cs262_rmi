@@ -192,8 +192,8 @@ public class QueuedServer implements ComputeServer, WorkQueue {
         try {
         	QueuedServer queuedServer = new QueuedServer();
     	    QueuedServer stub =
-    	        (QueuedServer) UnicastRemoteObject.exportObject(queuedServer, RMIPORT);
-    	    Registry registry = LocateRegistry.getRegistry();
+    	        (QueuedServer) UnicastRemoteObject.exportObject(queuedServer, 0);
+    	    Registry registry = LocateRegistry.getRegistry(RMIPORT);
     	    registry.rebind(RMINAME, stub);
     	    System.out.println("Group 2 Queued Server bound");
         } catch (Exception e) {
