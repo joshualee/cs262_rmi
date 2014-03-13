@@ -1,5 +1,6 @@
 package client;
 
+import edu.harvard.cs262.ComputeServer.ComputeServer;
 import securityManagers.DumbSecurityManager;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
@@ -7,7 +8,6 @@ import java.rmi.registry.Registry;
 import edu.harvard.cs262.ComputeServer.ComputeServer;
 
 import workTasks.SleepTask;
-import workerServer.QueuedServer;
 
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;

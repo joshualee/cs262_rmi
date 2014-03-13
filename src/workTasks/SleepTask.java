@@ -2,12 +2,15 @@ package workTasks;
 
 import edu.harvard.cs262.ComputeServer.WorkTask;
 
+import java.io.Serializable;
+
 /**
  * Created by perry on 3/13/14.
  */
-public class SleepTask implements WorkTask {
+public class SleepTask implements WorkTask, Serializable {
   private int sleepSeconds;
-  
+  private static final long serialVersionUID = 1L;
+
   public SleepTask(int sleepSeconds) {
 	  this.sleepSeconds = sleepSeconds;
   }

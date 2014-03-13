@@ -34,8 +34,9 @@ public class QueuedServer implements ComputeServer, WorkQueue {
 
 		workers.put(key, server);
 		freeWorkers.add(key);
-		freeWorkers.notify();
-
+    synchronized (freeWorkers) {
+		  freeWorkers.notify();
+    }
 		return key;
 	}
 
@@ -135,26 +136,33 @@ public class QueuedServer implements ComputeServer, WorkQueue {
 		ComputeServer worker;
 		Object returnVal;
 
-		while (freeWorkers.isEmpty()) {
-			try {
-				freeWorkers.wait();
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
-		}
+    synchronized (freeWorkers) {
+      while (freeWorkers.isEmpty()) {
+        try {
+            freeWorkers.wait();
+        } catch (InterruptedException e) {
+          e.printStackTrace();
+        }
+      }
 
-		workerUUID = freeWorkers.poll();
+		  workerUUID = freeWorkers.poll();
+    }
 		if (workerUUID != null) {
 			worker = workers.get(workerUUID);
 
 			if (worker != null) {
-				busyWorkers.add(workerUUID);
+        synchronized (busyWorkers) {
+          busyWorkers.add(workerUUID);
+        }
 				try {
 					returnVal = attemptWork(worker, work, MAXATTEMPTS);
-					busyWorkers.remove(workerUUID);
-					freeWorkers.add(workerUUID);
-					freeWorkers.notify();
-
+          synchronized (busyWorkers) {
+			  		busyWorkers.remove(workerUUID);
+          }
+					synchronized (freeWorkers) {
+            freeWorkers.add(workerUUID);
+            freeWorkers.notify();
+          }
 					return returnVal;
 				} catch (WorkServerFailedException e) {
 					unregisterWorker(workerUUID);
