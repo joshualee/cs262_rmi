@@ -19,13 +19,13 @@ public class QueuedServer implements ComputeServer, WorkQueue {
 	private final static String RMINAME = "G2QueuedServer";
 
 	private ConcurrentHashMap<UUID, ComputeServer> workers;
-	private ConcurrentLinkedQueue<UUID> freeWorkers, busyWorkers;
+	private LinkedBlockingQueue<UUID> freeWorkers, busyWorkers;
 
 	private QueuedServer(){
 		super();
 		workers = new ConcurrentHashMap<UUID, ComputeServer>();
-		freeWorkers = new ConcurrentLinkedQueue<UUID>();
-		busyWorkers = new ConcurrentLinkedQueue<UUID>();
+		freeWorkers = new LinkedBlockingQueue<UUID>();
+		busyWorkers = new LinkedBlockingQueue<UUID>();
 	}
 
 	@Override
@@ -33,11 +33,12 @@ public class QueuedServer implements ComputeServer, WorkQueue {
 		UUID key = UUID.randomUUID();
 
 		workers.put(key, server);
-		freeWorkers.add(key);
-    synchronized (freeWorkers) {
-		  freeWorkers.notify();
+    try {
+      freeWorkers.put(key);
+    } catch (InterruptedException e) {
+      e.printStackTrace();
     }
-		return key;
+    return key;
 	}
 
 	@Override
@@ -132,52 +133,46 @@ public class QueuedServer implements ComputeServer, WorkQueue {
 
 	@Override
 	public Object sendWork(WorkTask work) throws RemoteException {
-		UUID workerUUID;
+		UUID workerUUID = null;
 		ComputeServer worker;
 		Object returnVal;
-
-    synchronized (freeWorkers) {
-      while (freeWorkers.isEmpty()) {
-        try {
-            freeWorkers.wait();
-        } catch (InterruptedException e) {
-          e.printStackTrace();
-        }
-      }
-
-		  workerUUID = freeWorkers.poll();
-    }
-		if (workerUUID != null) {
-			worker = workers.get(workerUUID);
-
-			if (worker != null) {
-        synchronized (busyWorkers) {
-          busyWorkers.add(workerUUID);
-        }
-				try {
-					returnVal = attemptWork(worker, work, MAXATTEMPTS);
-          synchronized (busyWorkers) {
-			  		busyWorkers.remove(workerUUID);
-          }
-					synchronized (freeWorkers) {
-            freeWorkers.add(workerUUID);
-            freeWorkers.notify();
-          }
-					return returnVal;
-				} catch (WorkServerFailedException e) {
-					unregisterWorker(workerUUID);
-					// call recursively call sendWork below so another
-					// server picks up the work
-				}
-			}
-			/*
-			 * worker should never be null because workerUUID should always be
-			 * valid if it is, we have a UUID for a server that doesn't exist,
-			 * so clean up by not re-adding to freeWorkers
-			 */
-		}
-
-		return this.sendWork(work);
+    return work.doWork();
+//
+//    try {
+//      workerUUID = freeWorkers.take();
+//    } catch (InterruptedException e) {
+//      e.printStackTrace();
+//    }
+//    worker = workers.get(workerUUID);
+//
+//    if (worker != null) {
+//      try {
+//        busyWorkers.put(workerUUID);
+//      } catch (InterruptedException e) {
+//        e.printStackTrace();
+//      }
+//      try {
+//        returnVal = attemptWork(worker, work, MAXATTEMPTS);
+//        busyWorkers.remove(workerUUID);
+//        try {
+//          freeWorkers.put(workerUUID);
+//        } catch (InterruptedException e) {
+//          e.printStackTrace();
+//        }
+//        return returnVal;
+//      } catch (WorkServerFailedException e) {
+//        unregisterWorker(workerUUID);
+//        // call recursively call sendWork below so another
+//        // server picks up the work
+//      }
+//    }
+//    /*
+//     * worker should never be null because workerUUID should always be
+//     * valid if it is, we have a UUID for a server that doesn't exist,
+//     * so clean up by not re-adding to freeWorkers
+//     */
+//
+//		return this.sendWork(work);
 	}
 
 	@Override
