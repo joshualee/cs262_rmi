@@ -1,50 +1,41 @@
 package workerServer;
 
+import edu.harvard.cs262.ComputeServer.ComputeServer;
+import edu.harvard.cs262.ComputeServer.WorkQueue;
+import edu.harvard.cs262.ComputeServer.WorkTask;
+import securityManagers.DumbSecurityManager;
+
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
-import java.util.Hashtable;
-import java.util.LinkedList;
 import java.util.UUID;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
-
-import edu.harvard.cs262.ComputeServer.ComputeServer;
-import edu.harvard.cs262.ComputeServer.WorkQueue;
-import edu.harvard.cs262.ComputeServer.WorkTask;
+import java.util.concurrent.*;
 
 public class QueuedServer implements ComputeServer, WorkQueue {
-	private final int PINGTIMEOUT = 3; // in seconds 
-	private final int MAXATTEMPTS = 2; 
+	private final int PINGTIMEOUT = 3; // in seconds
+	private final int MAXATTEMPTS = 2;
 	private final static int RMIPORT = 8888;
 	private final static String RMINAME = "G2QueuedServer";
 
 	private ConcurrentHashMap<UUID, ComputeServer> workers;
 	private ConcurrentLinkedQueue<UUID> freeWorkers, busyWorkers;
-	
+
 	private QueuedServer(){
 		super();
 		workers = new ConcurrentHashMap<UUID, ComputeServer>();
 		freeWorkers = new ConcurrentLinkedQueue<UUID>();
 		busyWorkers = new ConcurrentLinkedQueue<UUID>();
 	}
-	
+
 	@Override
 	public UUID registerWorker(ComputeServer server) throws RemoteException {
 		UUID key = UUID.randomUUID();
-		
+
 		workers.put(key, server);
 		freeWorkers.add(key);
 		freeWorkers.notify();
-		
+
 		return key;
 	}
 
@@ -61,53 +52,53 @@ public class QueuedServer implements ComputeServer, WorkQueue {
 		busyWorkers.remove(workerID);
 		return true;
 	}
-	
+
 	private class PingTask implements Callable<Boolean> {
-		
+
 		private ComputeServer server;
-		
+
 		public PingTask(ComputeServer server) {
 			this.server = server;
 		}
-		
+
 		public Boolean call() throws RemoteException {
 			return server.PingServer();
 		}
-		
+
 	}
-	
+
 	private class WorkTaskWrapper implements Callable<Object> {
-		
+
 		private ComputeServer server;
 		private WorkTask work;
-		
+
 		public WorkTaskWrapper(ComputeServer server, WorkTask work) {
 			this.server = server;
 			this.work = work;
 		}
-		
+
 		public Object call() throws RemoteException {
 			return server.sendWork(work);
 		}
 	}
-	
+
 	private class WorkServerFailedException extends Exception {
 		private static final long serialVersionUID = 1L;
 	}
-	
+
 	private Object attemptWork(ComputeServer worker, WorkTask work, int maxAttempts) throws WorkServerFailedException {
 		Future<Boolean> pingFuture;
-		
+
 		ExecutorService pool = Executors.newFixedThreadPool(2);
 		PingTask pingCallable = new PingTask(worker);
 		WorkTaskWrapper workCallable = new WorkTaskWrapper(worker, work);
-		
+
 		Future<Object> workFuture = pool.submit(workCallable);
-		
+
 		int failedAttempts = 0;
 		while (failedAttempts < maxAttempts) {
 			pingFuture = pool.submit(pingCallable);
-			
+
 			try {
 				pingFuture.get(PINGTIMEOUT, TimeUnit.SECONDS);
 				if (workFuture.isDone()) {
@@ -124,24 +115,24 @@ public class QueuedServer implements ComputeServer, WorkQueue {
 				failedAttempts++;
 			}
 		}
-		
-		
+
+
 		/*
 		 * While it is possible that the server may not respond to ping
 		 * but will complete the work, we only accept completed work
 		 * from a server that also responds to ping.
 		 */
 		workFuture.cancel(true);
-		
+
 		throw new WorkServerFailedException();
 	}
-		
+
 	@Override
 	public Object sendWork(WorkTask work) throws RemoteException {
 		UUID workerUUID;
 		ComputeServer worker;
 		Object returnVal;
-		
+
 		while (freeWorkers.isEmpty()) {
 			try {
 				freeWorkers.wait();
@@ -150,11 +141,11 @@ public class QueuedServer implements ComputeServer, WorkQueue {
 				e.printStackTrace();
 			}
 		}
-		
+
 		workerUUID = freeWorkers.poll();
 		if (workerUUID != null) {
 			worker = workers.get(workerUUID);
-			
+
 			if (worker != null) {
 				busyWorkers.add(workerUUID);
 				try {
@@ -162,7 +153,7 @@ public class QueuedServer implements ComputeServer, WorkQueue {
 					busyWorkers.remove(workerUUID);
 					freeWorkers.add(workerUUID);
 					freeWorkers.notify();
-					
+
 					return returnVal;
 				} catch (WorkServerFailedException e) {
 					unregisterWorker(workerUUID);
@@ -176,7 +167,7 @@ public class QueuedServer implements ComputeServer, WorkQueue {
 			 * so clean up by not re-adding to freeWorkers
 			 */
 		}
-		
+
 		return this.sendWork(work);
 	}
 
@@ -184,16 +175,16 @@ public class QueuedServer implements ComputeServer, WorkQueue {
 	public boolean PingServer() throws RemoteException {
 		return true;
 	}
-	
+
     public static void main(String[] args) {
         if (System.getSecurityManager() == null) {
-            System.setSecurityManager(new SecurityManager());
+            System.setSecurityManager(new DumbSecurityManager());
         }
         try {
-        	QueuedServer queuedServer = new QueuedServer();
-    	    QueuedServer stub =
-    	        (QueuedServer) UnicastRemoteObject.exportObject(queuedServer, 0);
-    	    Registry registry = LocateRegistry.getRegistry(RMIPORT);
+        	ComputeServer queuedServer = new QueuedServer();
+    	    ComputeServer stub =
+    	        (ComputeServer) UnicastRemoteObject.exportObject(queuedServer, 0);
+    	    Registry registry = LocateRegistry.createRegistry(RMIPORT);
     	    registry.rebind(RMINAME, stub);
     	    System.out.println("Group 2 Queued Server bound");
         } catch (Exception e) {
