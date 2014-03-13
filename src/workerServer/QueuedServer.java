@@ -13,9 +13,9 @@ import java.util.UUID;
 import java.util.concurrent.*;
 
 public class QueuedServer implements ComputeServer, WorkQueue {
-	private final int PINGTIMEOUT = 3; // in seconds
 	private final int MAXATTEMPTS = 2;
 	private final static int RMIPORT = 8888;
+	private final int PINGTIMEOUT = 3; // in seconds
 	private final static String RMINAME = "G2QueuedServer";
 
 	private ConcurrentHashMap<UUID, ComputeServer> workers;
@@ -105,7 +105,9 @@ public class QueuedServer implements ComputeServer, WorkQueue {
 					return workFuture.get();
 				}
 				failedAttempts = 0;
-			} catch (InterruptedException|ExecutionException|TimeoutException e) {
+			}
+//			catch (InterruptedException|ExecutionException|TimeoutException e) {
+				catch (Exception e) {
 				/*
 				 * Our worker server failed by either:
 				 * (1) RMI Remote Exception
@@ -137,7 +139,6 @@ public class QueuedServer implements ComputeServer, WorkQueue {
 			try {
 				freeWorkers.wait();
 			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}
