@@ -4,8 +4,6 @@ import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
-import java.util.Hashtable;
-import java.util.LinkedList;
 import java.util.UUID;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentHashMap;
@@ -24,7 +22,7 @@ import edu.harvard.cs262.ComputeServer.WorkTask;
 public class QueuedServer implements ComputeServer, WorkQueue {
 	private final int PINGTIMEOUT = 3; // in seconds 
 	private final int MAXATTEMPTS = 2; 
-	private final static int RMIPORT = 8888;
+	private final static int RMIPORT = 8080;
 	private final static String RMINAME = "G2QueuedServer";
 
 	private ConcurrentHashMap<UUID, ComputeServer> workers;
@@ -114,7 +112,9 @@ public class QueuedServer implements ComputeServer, WorkQueue {
 					return workFuture.get();
 				}
 				failedAttempts = 0;
-			} catch (InterruptedException|ExecutionException|TimeoutException e) {
+			} 
+//			catch (InterruptedException|ExecutionException|TimeoutException e) {
+				catch (Exception e) {
 				/*
 				 * Our worker server failed by either:
 				 * (1) RMI Remote Exception
@@ -146,7 +146,6 @@ public class QueuedServer implements ComputeServer, WorkQueue {
 			try {
 				freeWorkers.wait();
 			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}
@@ -186,14 +185,15 @@ public class QueuedServer implements ComputeServer, WorkQueue {
 	}
 	
     public static void main(String[] args) {
-        if (System.getSecurityManager() == null) {
-            System.setSecurityManager(new SecurityManager());
-        }
+    	// TODO: write policy file
+//        if (System.getSecurityManager() == null) {
+//            System.setSecurityManager(new SecurityManager());
+//        }
         try {
         	QueuedServer queuedServer = new QueuedServer();
-    	    QueuedServer stub =
-    	        (QueuedServer) UnicastRemoteObject.exportObject(queuedServer, 0);
-    	    Registry registry = LocateRegistry.getRegistry(RMIPORT);
+        	Registry registry = LocateRegistry.getRegistry();
+        	ComputeServer stub =
+    	        (ComputeServer) UnicastRemoteObject.exportObject(queuedServer);
     	    registry.rebind(RMINAME, stub);
     	    System.out.println("Group 2 Queued Server bound");
         } catch (Exception e) {
