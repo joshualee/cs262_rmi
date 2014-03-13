@@ -1,6 +1,11 @@
 package client;
 
 import securityManagers.DumbSecurityManager;
+import java.rmi.registry.LocateRegistry;
+import java.rmi.registry.Registry;
+
+import edu.harvard.cs262.ComputeServer.ComputeServer;
+
 import workTasks.SleepTask;
 import workerServer.QueuedServer;
 
@@ -29,7 +34,7 @@ public class SimpleClient {
         }
         try {
             Registry registry = LocateRegistry.getRegistry(rmiHost, rmiPort);
-            QueuedServer server = (QueuedServer) registry.lookup(rmiName);
+            ComputeServer server = (ComputeServer) registry.lookup(rmiName);
 
             // make some tasks
             returnVal = (Integer) server.sendWork(sleepTask1);

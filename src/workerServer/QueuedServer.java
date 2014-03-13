@@ -180,6 +180,9 @@ public class QueuedServer implements ComputeServer, WorkQueue {
     public static void main(String[] args) {
         if (System.getSecurityManager() == null) {
             System.setSecurityManager(new DumbSecurityManager());
+    	// TODO: write policy file
+//        if (System.getSecurityManager() == null) {
+//            System.setSecurityManager(new SecurityManager());
         }
         try {
         	ComputeServer queuedServer = new QueuedServer();
