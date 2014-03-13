@@ -1,6 +1,9 @@
 package workerServer;
 
 import java.rmi.RemoteException;
+import java.rmi.registry.LocateRegistry;
+import java.rmi.registry.Registry;
+import java.rmi.server.UnicastRemoteObject;
 import java.util.Hashtable;
 import java.util.LinkedList;
 import java.util.UUID;
@@ -19,11 +22,13 @@ import edu.harvard.cs262.ComputeServer.WorkQueue;
 import edu.harvard.cs262.ComputeServer.WorkTask;
 
 public class QueuedServer implements ComputeServer, WorkQueue {
+	private final int PINGTIMEOUT = 3; // in seconds 
+	private final int MAXATTEMPTS = 2; 
+	private final static int RMIPORT = 8888;
+	private final static String RMINAME = "G2QueuedServer";
 
 	private ConcurrentHashMap<UUID, ComputeServer> workers;
 	private ConcurrentLinkedQueue<UUID> freeWorkers, busyWorkers;
-	private final int PINGTIMEOUT = 3; // in seconds 
-	private final int MAXATTEMPTS = 2; 
 	
 	private QueuedServer(){
 		super();
@@ -179,5 +184,21 @@ public class QueuedServer implements ComputeServer, WorkQueue {
 	public boolean PingServer() throws RemoteException {
 		return true;
 	}
-
+	
+    public static void main(String[] args) {
+        if (System.getSecurityManager() == null) {
+            System.setSecurityManager(new SecurityManager());
+        }
+        try {
+        	QueuedServer queuedServer = new QueuedServer();
+    	    QueuedServer stub =
+    	        (QueuedServer) UnicastRemoteObject.exportObject(queuedServer, RMIPORT);
+    	    Registry registry = LocateRegistry.getRegistry();
+    	    registry.rebind(RMINAME, stub);
+    	    System.out.println("Group 2 Queued Server bound");
+        } catch (Exception e) {
+        	System.out.println("Group 2 Queued Server exception");
+        	e.printStackTrace();
+        }
+    }
 }
