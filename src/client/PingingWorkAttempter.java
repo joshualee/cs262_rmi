@@ -42,6 +42,7 @@ public class PingingWorkAttempter implements WorkAttempter {
     }
   }
 
+  @Override
   public Object attemptWork(ComputeServer worker, WorkTask work, int maxAttempts, int pingTimeout) throws WorkFailedException {
     Future<Boolean> pingFuture;
 
