@@ -14,10 +14,11 @@ import java.util.concurrent.LinkedBlockingQueue;
 
 public class QueuedServer implements ComputeServer, WorkQueue {
 	private final int MAXATTEMPTS = 2;
-	private final static int RMIPORT = 8888;
+	private final static int RMIPORT = 8080;
 	private final int PINGTIMEOUT = 3; // in seconds
 	private final static String RMINAME = "G2QueuedServer";
-  private final WorkAttempter workAttempter;
+	private final WorkAttempter workAttempter;
+	private final static int VERBOSE = 1;
 
 	private ConcurrentHashMap<UUID, ComputeServer> workers;
 	private LinkedBlockingQueue<UUID> freeWorkers, busyWorkers;
@@ -27,12 +28,16 @@ public class QueuedServer implements ComputeServer, WorkQueue {
 		workers = new ConcurrentHashMap<UUID, ComputeServer>();
 		freeWorkers = new LinkedBlockingQueue<UUID>();
 		busyWorkers = new LinkedBlockingQueue<UUID>();
-    workAttempter = new PingingWorkAttempter();
+		workAttempter = new PingingWorkAttempter();
 	}
 
 	@Override
 	public UUID registerWorker(ComputeServer server) throws RemoteException {
 		UUID key = UUID.randomUUID();
+		
+		if (VERBOSE > 0) {
+			System.out.println("Registering new worker " + key);
+		}
 
 		workers.put(key, server);
     try {
@@ -45,6 +50,10 @@ public class QueuedServer implements ComputeServer, WorkQueue {
 
 	@Override
 	public boolean unregisterWorker(UUID workerID) throws RemoteException{
+		if (VERBOSE > 0) {
+			System.out.println("Unregistering worker " + workerID);
+		}
+		
 		if (null == workers.get(workerID)){
 			return true;
 		}
@@ -59,6 +68,11 @@ public class QueuedServer implements ComputeServer, WorkQueue {
 
 	@Override
 	public Object sendWork(WorkTask work) throws RemoteException {
+		if (VERBOSE > 0) {
+			System.out.println("Received work");
+		}
+		
+		
 		UUID workerUUID = null;
 		ComputeServer worker;
 		Object returnVal;
@@ -85,6 +99,11 @@ public class QueuedServer implements ComputeServer, WorkQueue {
         } catch (InterruptedException e) {
           e.printStackTrace();
         }
+        
+        if (VERBOSE > 0) {
+			System.out.println("Completed work with result: " + returnVal);
+		}
+        
         return returnVal;
       } catch (WorkFailedException e) {
         unregisterWorker(workerUUID);
@@ -103,6 +122,9 @@ public class QueuedServer implements ComputeServer, WorkQueue {
 
 	@Override
 	public boolean PingServer() throws RemoteException {
+		if (VERBOSE > 0) {
+			System.out.println("Being pinged");
+		}
 		return true;
 	}
 

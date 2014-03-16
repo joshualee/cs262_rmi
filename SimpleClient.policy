@@ -1,0 +1,3 @@
+grant codeBase "http://10.251.55.21:8888/cs262/client" {
+    permission java.security.AllPermission;
+};
