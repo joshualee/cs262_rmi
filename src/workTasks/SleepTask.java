@@ -5,12 +5,19 @@ import edu.harvard.cs262.ComputeServer.WorkTask;
 import java.io.Serializable;
 
 /**
- * Created by perry on 3/13/14.
+ * A SleepTask is a {@link edu.harvard.cs262.ComputeServer.WorkTask} that sleeps
+ * for some period of time, and then returns Integer(1337).
  */
 public class SleepTask implements WorkTask, Serializable {
   private int sleepSeconds;
   private static final long serialVersionUID = 1L;
 
+  /**
+   * Constructor that takes in a length of time to sleep for before
+   * returning.
+   *
+   * @param sleepSeconds Length of time to sleep before returning, in seconds.
+   */
   public SleepTask(int sleepSeconds) {
 	  this.sleepSeconds = sleepSeconds;
   }

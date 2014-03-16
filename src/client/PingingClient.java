@@ -11,7 +11,7 @@ import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 
 /**
- * Created by perry on 3/16/14.
+ * A PingingClient
  */
 public class PingingClient {
   private WorkTask work;
@@ -51,6 +51,7 @@ public class PingingClient {
     try {
       Registry registry = LocateRegistry.getRegistry(rmiHost, rmiPort);
       ComputeServer server = (ComputeServer) registry.lookup(rmiName);
+      System.out.println("Connected to registry");
       PingingClient client = new PingingClient(sleepTask1, server);
       Object answer = client.getAnswer();
       System.out.println("Answer: " + answer);
