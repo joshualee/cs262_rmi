@@ -127,10 +127,14 @@ public class QueuedServer implements ComputeServer, WorkQueue {
 	}
 
   public static void main(String[] args) {
+	  // Ensure it is safe to download remote security definitions with Security
+	  // Manager
 	  if (System.getSecurityManager() == null) {
 		  System.setSecurityManager(new SecurityManager());
 	  }
       try {
+    	// Create RMI registry, bind QueuedServer stub to common name for client
+    	// and Worker Servers to access
         ComputeServer queuedServer = new QueuedServer();
         ComputeServer stub =
             (ComputeServer) UnicastRemoteObject.exportObject(queuedServer, 0);

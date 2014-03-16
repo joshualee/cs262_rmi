@@ -3,7 +3,6 @@ package workerServer;
 import edu.harvard.cs262.ComputeServer.ComputeServer;
 import edu.harvard.cs262.ComputeServer.WorkQueue;
 import edu.harvard.cs262.ComputeServer.WorkTask;
-import securityManagers.DumbSecurityManager;
 
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
@@ -48,6 +47,7 @@ public class WorkerServer implements ComputeServer {
   }
 
   public static void main(String args[]) {
+	// Parse RMI arguments: host, port, name of QueuedServer
     int rmiPort;
     String rmiHost, rmiName;
 
@@ -60,14 +60,18 @@ public class WorkerServer implements ComputeServer {
     rmiPort = Integer.parseInt(args[1]);
     rmiName = args[2];
 
+    // Ensure it is safe to download remote security definitions with Security
+    // Manager
     if (System.getSecurityManager() == null) {
       System.setSecurityManager(new SecurityManager());
     }
     try {
+      // Locate the Queue Server and register self with it
       Registry registry = LocateRegistry.getRegistry(rmiHost, rmiPort);
       WorkQueue queueServer = (WorkQueue) registry.lookup(rmiName);
       ComputeServer workerServer = new WorkerServer();
-      queueServer.registerWorker((ComputeServer) UnicastRemoteObject.exportObject(workerServer, 0));
+      queueServer.registerWorker((ComputeServer)
+    		  UnicastRemoteObject.exportObject(workerServer, 0));
     } catch (Exception e) {
       System.err.println("Worker Server exception:");
       e.printStackTrace();

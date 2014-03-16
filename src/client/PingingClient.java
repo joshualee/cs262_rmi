@@ -33,6 +33,7 @@ public class PingingClient {
   }
 
   public static void main(String args[]) {
+	// Parse RMI arguments: host, port, name of ComputeServer
     int rmiPort;
     String rmiHost, rmiName;
     WorkTask sleepTask = new SleepTask(10);
@@ -45,11 +46,14 @@ public class PingingClient {
     rmiHost = args[0];
     rmiPort = Integer.parseInt(args[1]);
     rmiName = args[2];
-
+    
+    // Ensure it is safe to download remote security definitions with Security
+    // Manager
     if (System.getSecurityManager() == null) {
       System.setSecurityManager(new DumbSecurityManager());
     }
     try {
+      // Locate the ComputeServer and start sending it work
       Registry registry = LocateRegistry.getRegistry(rmiHost, rmiPort);
       ComputeServer server = (ComputeServer) registry.lookup(rmiName);
       if (VERBOSE > 0)
