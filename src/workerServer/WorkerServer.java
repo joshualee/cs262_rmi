@@ -14,12 +14,12 @@ import java.rmi.RemoteException;
  * own machine.<p>
  */
 public class WorkerServer implements ComputeServer {
-  public static int VERBOSE = 1; 
-  
+  public static int VERBOSE = 1;
+
   /**
    * See {@link edu.harvard.cs262.ComputeServer.ComputeServer#sendWork(WorkTask)}.
-   * 
-   * @param work - the {@link WorkTask} object to be executed via doWork 
+   *
+   * @param work - the {@link WorkTask} object to be executed via doWork
    * @return the result of the doWork call on work
    * @throws RemoteException
    */
@@ -31,12 +31,13 @@ public class WorkerServer implements ComputeServer {
     }
     return result;
   }
-  
-  /** 
-   * See {@link edu.harvard.cs262.ComputeServer.ComputeServer#PingServer()}.
-   * 
-   * @return true if the server is still responding 
+
+  /**
+   * Pings the server.
+   *
+   * @return true if the server is still responding
    * @throws RemoteException
+   * @see edu.harvard.cs262.ComputeServer.ComputeServer#PingServer()
    */
   @Override
   public boolean PingServer() throws RemoteException {
