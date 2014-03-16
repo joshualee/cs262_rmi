@@ -72,50 +72,48 @@ public class QueuedServer implements ComputeServer, WorkQueue {
 			System.out.println("Received work");
 		}
 		
-		
 		UUID workerUUID = null;
 		ComputeServer worker;
 		Object returnVal;
-//    return work.doWork();
-
-    try {
-      workerUUID = freeWorkers.take();
-    } catch (InterruptedException e) {
-      e.printStackTrace();
-    }
-    worker = workers.get(workerUUID);
-
-    if (worker != null) {
-      try {
-        busyWorkers.put(workerUUID);
-      } catch (InterruptedException e) {
-        e.printStackTrace();
-      }
-      try {
-        returnVal = workAttempter.attemptWork(worker, work, MAXATTEMPTS, PINGTIMEOUT);
-        busyWorkers.remove(workerUUID);
-        try {
-          freeWorkers.put(workerUUID);
-        } catch (InterruptedException e) {
-          e.printStackTrace();
-        }
-        
-        if (VERBOSE > 0) {
-			System.out.println("Completed work with result: " + returnVal);
-		}
-        
-        return returnVal;
-      } catch (WorkFailedException e) {
-        unregisterWorker(workerUUID);
-        // call recursively call sendWork below so another
-        // server picks up the work
-      }
-    }
-    /*
-     * worker should never be null because workerUUID should always be
-     * valid if it is, we have a UUID for a server that doesn't exist,
-     * so clean up by not re-adding to freeWorkers
-     */
+	
+	    try {
+	      workerUUID = freeWorkers.take();
+	    } catch (InterruptedException e) {
+	      e.printStackTrace();
+	    }
+	    worker = workers.get(workerUUID);
+	
+	    if (worker != null) {
+	      try {
+	        busyWorkers.put(workerUUID);
+	      } catch (InterruptedException e) {
+	        e.printStackTrace();
+	      }
+	      try {
+	        returnVal = workAttempter.attemptWork(worker, work, MAXATTEMPTS, PINGTIMEOUT);
+	        busyWorkers.remove(workerUUID);
+	        try {
+	          freeWorkers.put(workerUUID);
+	        } catch (InterruptedException e) {
+	          e.printStackTrace();
+	        }
+	        
+	        if (VERBOSE > 0) {
+				System.out.println("Completed work with result: " + returnVal);
+			}
+	        
+	        return returnVal;
+	      } catch (WorkFailedException e) {
+	        unregisterWorker(workerUUID);
+	        // call recursively call sendWork below so another
+	        // server picks up the work
+	      }
+	    }
+	    /*
+	     * worker should never be null because workerUUID should always be
+	     * valid if it is, we have a UUID for a server that doesn't exist,
+	     * so clean up by not re-adding to freeWorkers
+	     */
 
 		return this.sendWork(work);
 	}
@@ -129,12 +127,9 @@ public class QueuedServer implements ComputeServer, WorkQueue {
 	}
 
   public static void main(String[] args) {
-      if (System.getSecurityManager() == null) {
-          System.setSecurityManager(new DumbSecurityManager());
-    // TODO: write policy file
-//        if (System.getSecurityManager() == null) {
-//            System.setSecurityManager(new SecurityManager());
-      }
+	  if (System.getSecurityManager() == null) {
+		  System.setSecurityManager(new SecurityManager());
+	  }
       try {
         ComputeServer queuedServer = new QueuedServer();
         ComputeServer stub =

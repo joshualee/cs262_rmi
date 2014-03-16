@@ -1,3 +1,1 @@
-grant codeBase "http://10.251.55.21:8888/cs262/server" {
-    permission java.security.AllPermission;
-};
+grant { permission java.security.AllPermission; };
