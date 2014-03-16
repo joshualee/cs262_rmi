@@ -11,7 +11,7 @@ import java.rmi.RemoteException;
 
 /**
  * The {@link ComputeServer} implementation that does the work sent to it on its
- * own machine.<p>
+ * own machine.
  */
 public class WorkerServer implements ComputeServer {
   public static int VERBOSE = 1; 
@@ -19,7 +19,7 @@ public class WorkerServer implements ComputeServer {
   /**
    * See {@link edu.harvard.cs262.ComputeServer.ComputeServer#sendWork(WorkTask)}.
    * 
-   * @param work - the {@link WorkTask} object to be executed via doWork 
+   * @param work the {@link WorkTask} object to be executed via doWork 
    * @return the result of the doWork call on work
    * @throws RemoteException
    */

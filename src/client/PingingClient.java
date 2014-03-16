@@ -11,7 +11,7 @@ import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 
 /**
- * A PingingClient
+ * A client that sends {@link WorkTask} objects to a {@link ComputeServer}.
  */
 public class PingingClient {
   private static final int VERBOSE = 1;
@@ -21,13 +21,27 @@ public class PingingClient {
   private final int MAXATTEMPTS = 3;
   private final int PINGTIMEOUT = 3;
 
-
+  /**
+   * Default constructor for {@link PingingClient}.
+   * 
+   * @param work
+   * 	the {@link WorkTask} object this client wants to have computed
+   * @param server
+   * 	the {@link ComputeServer} on which to compute the {@link WorkTask}
+   */
   public PingingClient(WorkTask work, ComputeServer server) {
     this.work = work;
     this.server = server;
     this.workAttempter = new PingingWorkAttempter();
   }
 
+  /**
+   * Returns the result of the work assigned by this {@PingingClient}.
+   * 
+   * @return the result of doing the {@link WorkTask} on the
+   * {@link ComputeServer}
+   * @throws WorkFailedException
+   */
   public Object getAnswer() throws WorkFailedException {
     return workAttempter.attemptWork(server, work, MAXATTEMPTS, PINGTIMEOUT);
   }
