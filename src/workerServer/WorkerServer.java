@@ -1,11 +1,14 @@
 package workerServer;
 
 import edu.harvard.cs262.ComputeServer.ComputeServer;
+import edu.harvard.cs262.ComputeServer.WorkQueue;
 import edu.harvard.cs262.ComputeServer.WorkTask;
 import securityManagers.DumbSecurityManager;
 
+import java.io.Serializable;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
+import java.rmi.server.UnicastRemoteObject;
 import java.rmi.RemoteException;
 
 /**
@@ -13,7 +16,7 @@ import java.rmi.RemoteException;
  */
 public class WorkerServer implements ComputeServer {
 
-  @Override
+@Override
   public Object sendWork(WorkTask work) throws RemoteException {
     return work.doWork();
   }
@@ -41,9 +44,9 @@ public class WorkerServer implements ComputeServer {
     }
     try {
       Registry registry = LocateRegistry.getRegistry(rmiHost, rmiPort);
-      QueuedServer queueServer = (QueuedServer) registry.lookup(rmiName);
-      WorkerServer workerServer = new WorkerServer();
-      queueServer.registerWorker(workerServer);
+      WorkQueue queueServer = (WorkQueue) registry.lookup(rmiName);
+      ComputeServer workerServer = new WorkerServer();
+      queueServer.registerWorker((ComputeServer) UnicastRemoteObject.exportObject(workerServer, 0));
     } catch (Exception e) {
       System.err.println("Worker Server exception:");
       e.printStackTrace();
