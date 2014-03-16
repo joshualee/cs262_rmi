@@ -2,11 +2,6 @@ package client;
 
 import edu.harvard.cs262.ComputeServer.ComputeServer;
 import securityManagers.DumbSecurityManager;
-import java.rmi.registry.LocateRegistry;
-import java.rmi.registry.Registry;
-
-import edu.harvard.cs262.ComputeServer.ComputeServer;
-
 import workTasks.SleepTask;
 
 import java.rmi.registry.LocateRegistry;
@@ -29,21 +24,21 @@ public class SimpleClient {
 		rmiPort = Integer.parseInt(args[1]);
 		rmiName = args[2];
 
-        if (System.getSecurityManager() == null) {
-            System.setSecurityManager(new DumbSecurityManager());
-        }
-        try {
-            Registry registry = LocateRegistry.getRegistry(rmiHost, rmiPort);
-            ComputeServer server = (ComputeServer) registry.lookup(rmiName);
-
-            // make some tasks
-            returnVal = (Integer) server.sendWork(sleepTask1);
-
-            System.out.println(returnVal);
-
-        } catch (Exception e) {
-            System.err.println("Simple Client exception:");
-            e.printStackTrace();
-        }
+    if (System.getSecurityManager() == null) {
+        System.setSecurityManager(new DumbSecurityManager());
     }
+    try {
+        Registry registry = LocateRegistry.getRegistry(rmiHost, rmiPort);
+        ComputeServer server = (ComputeServer) registry.lookup(rmiName);
+
+        // make some tasks
+        returnVal = (Integer) server.sendWork(sleepTask1);
+
+        System.out.println(returnVal);
+
+    } catch (Exception e) {
+        System.err.println("Simple Client exception:");
+        e.printStackTrace();
+    }
+  }
 }
