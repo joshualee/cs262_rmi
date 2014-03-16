@@ -5,7 +5,6 @@ import edu.harvard.cs262.ComputeServer.WorkQueue;
 import edu.harvard.cs262.ComputeServer.WorkTask;
 import securityManagers.DumbSecurityManager;
 
-import java.io.Serializable;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
@@ -15,14 +14,22 @@ import java.rmi.RemoteException;
  * Created by perry on 3/13/14.
  */
 public class WorkerServer implements ComputeServer {
-
+  public static int VERBOSE = 1; 
+  
 @Override
   public Object sendWork(WorkTask work) throws RemoteException {
-    return work.doWork();
+	Object result = work.doWork();
+    if (VERBOSE > 0) {
+    	System.out.println(result);
+    }
+    return result;
   }
 
   @Override
   public boolean PingServer() throws RemoteException {
+	if (VERBOSE > 0) {
+		System.out.println("got pinged");
+	}
     return true;
   }
 
