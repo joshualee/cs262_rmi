@@ -62,6 +62,7 @@ public class PingingWorkAttempter implements WorkAttempter {
           return workFuture.get();
         }
         failedAttempts = 0;
+        Thread.sleep(1000);
       }
 //			catch (InterruptedException|ExecutionException|TimeoutException e) {
       catch (Exception e) {

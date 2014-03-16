@@ -14,6 +14,7 @@ import java.rmi.registry.Registry;
  * A PingingClient
  */
 public class PingingClient {
+  private static final int VERBOSE = 1;
   private WorkTask work;
   private ComputeServer server;
   private WorkAttempter workAttempter;
@@ -34,7 +35,7 @@ public class PingingClient {
   public static void main(String args[]) {
     int rmiPort;
     String rmiHost, rmiName;
-    WorkTask sleepTask1 = new SleepTask(1);
+    WorkTask sleepTask = new SleepTask(10);
 
     if (args.length != 3) {
       System.err.println("usage: java PingingClient host port rminame");
@@ -51,8 +52,9 @@ public class PingingClient {
     try {
       Registry registry = LocateRegistry.getRegistry(rmiHost, rmiPort);
       ComputeServer server = (ComputeServer) registry.lookup(rmiName);
-      System.out.println("Connected to registry");
-      PingingClient client = new PingingClient(sleepTask1, server);
+      if (VERBOSE > 0)
+        System.out.println("Connected to registry");
+      PingingClient client = new PingingClient(sleepTask, server);
       Object answer = client.getAnswer();
       System.out.println("Answer: " + answer);
 
