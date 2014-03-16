@@ -47,7 +47,7 @@ public class WorkerServer implements ComputeServer {
     rmiName = args[2];
 
     if (System.getSecurityManager() == null) {
-      System.setSecurityManager(new DumbSecurityManager());
+      System.setSecurityManager(new SecurityManager());
     }
     try {
       Registry registry = LocateRegistry.getRegistry(rmiHost, rmiPort);
