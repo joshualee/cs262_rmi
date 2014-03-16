@@ -1,8 +1,9 @@
 package edu.harvard.cs262.ComputeServer;
 
 /**
- * A WorkAttempter is an encapsulates all the logic needed to send work
- * to a {@link edu.harvard.cs262.ComputeServer.ComputeServer}
+ * A WorkAttempter encapsulates all the logic needed to send work to
+ * a {@link edu.harvard.cs262.ComputeServer.ComputeServer}, while also
+ * pinging it to make sure that it is still running.
  */
 
 public interface WorkAttempter {
