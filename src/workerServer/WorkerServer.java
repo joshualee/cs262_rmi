@@ -11,12 +11,20 @@ import java.rmi.server.UnicastRemoteObject;
 import java.rmi.RemoteException;
 
 /**
- * Created by perry on 3/13/14.
+ * The {@link ComputeServer} implementation that does the work sent to it on its
+ * own machine.<p>
  */
 public class WorkerServer implements ComputeServer {
   public static int VERBOSE = 1; 
   
-@Override
+  /**
+   * See {@link edu.harvard.cs262.ComputeServer.ComputeServer#sendWork(WorkTask)}.
+   * 
+   * @param work - the {@link WorkTask} object to be executed via doWork 
+   * @return the result of the doWork call on work
+   * @throws RemoteException
+   */
+  @Override
   public Object sendWork(WorkTask work) throws RemoteException {
 	Object result = work.doWork();
     if (VERBOSE > 0) {
@@ -24,7 +32,13 @@ public class WorkerServer implements ComputeServer {
     }
     return result;
   }
-
+  
+  /** 
+   * See {@link edu.harvard.cs262.ComputeServer.ComputeServer#PingServer()}.
+   * 
+   * @return true if the server is still responding 
+   * @throws RemoteException
+   */
   @Override
   public boolean PingServer() throws RemoteException {
 	if (VERBOSE > 0) {
