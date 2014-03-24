@@ -1,4 +1,4 @@
-Group 2 RMI
+CS262 RMI Exercise (Group 2)
 =============
 
 A three-tier, queued compute server system using RMI built for CS262: Introduction to Distributed Systems (Harvard Spring 2014).
@@ -14,7 +14,10 @@ Usage
 -----------------
 ####WorkQueue
 
-`java -Djava.security.policy=server.policy -Djava.rmi.server.codebase=http://example.com/rmi262.jar -Djava.rmi.server.useCodebaseOnly=false -classpath <path>workerServer.QueuedServer rmiPort rmiName`
+`java -Djava.security.policy=server.policy
+ -Djava.rmi.server.codebase=http://example.com/rmi262.jar 
+ -Djava.rmi.server.useCodebaseOnly=false 
+ -classpath <path>workerServer.QueuedServer rmiPort rmiName`
 
 ####ComputeServer
 
