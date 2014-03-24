@@ -8,6 +8,7 @@ import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
 import java.rmi.RemoteException;
+import java.util.UUID;
 
 /**
  * The {@link ComputeServer} implementation that does the work sent to it on its
@@ -71,8 +72,12 @@ public class WorkerServer implements ComputeServer {
       Registry registry = LocateRegistry.getRegistry(rmiHost, rmiPort);
       WorkQueue queueServer = (WorkQueue) registry.lookup(rmiName);
       ComputeServer workerServer = new WorkerServer();
-      queueServer.registerWorker((ComputeServer)
+      UUID id = queueServer.registerWorker((ComputeServer)
     		  UnicastRemoteObject.exportObject(workerServer, 0));
+      
+      if (VERBOSE > 0) {
+    	  System.out.println("Successfully registered with UUID" + id);
+      }
     } catch (Exception e) {
       System.err.println("Worker Server exception:");
       e.printStackTrace();

@@ -25,8 +25,8 @@ Usage
 	java -Djava.security.policy=server.policy 
 	-Djava.rmi.server.codebase=http://example.com/rmi262.jar 
 	-Djava.rmi.server.useCodebaseOnly=false 
-	-classpath <path> workerServer.
-	WorkerServer rmiHost rmiPort rmiName
+	-classpath <path> 
+	workerServer.WorkerServer rmiHost rmiPort rmiName
 
 ####Client
 

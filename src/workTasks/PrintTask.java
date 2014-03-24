@@ -3,12 +3,14 @@ package workTasks;
 import edu.harvard.cs262.ComputeServer.WorkTask;
 
 import java.io.File;
+import java.io.Serializable;
 import java.util.Scanner;
 /**
  * Created by perry on 3/16/14.
  */
-public class PrintTask implements WorkTask {
+public class PrintTask implements WorkTask, Serializable {
   private String str;
+  private static final long serialVersionUID = 1L;
 
   public PrintTask() {
     this.str = fileAsString("./src/workTasks/trollface.txt");

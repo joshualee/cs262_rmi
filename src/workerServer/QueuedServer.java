@@ -14,9 +14,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 
 public class QueuedServer implements ComputeServer, WorkQueue {
 	private final int MAXATTEMPTS = 2;
-	private final static int RMIPORT = 8080;
 	private final int PINGTIMEOUT = 3; // in seconds
-	private final static String RMINAME = "G2QueuedServer";
 	private final WorkAttempter workAttempter;
 	private final static int VERBOSE = 1;
 
@@ -127,6 +125,14 @@ public class QueuedServer implements ComputeServer, WorkQueue {
 	}
 
   public static void main(String[] args) {
+	  if (args.length != 2) {
+		  System.err.println("usage: java QueuedServer rmiport rminame");
+		  System.exit(1);
+      }
+
+	  int rmiPort = Integer.parseInt(args[0]);
+      String rmiName = args[1];
+	  
 	  // Ensure it is safe to download remote security definitions with Security
 	  // Manager
 	  if (System.getSecurityManager() == null) {
@@ -138,8 +144,8 @@ public class QueuedServer implements ComputeServer, WorkQueue {
         ComputeServer queuedServer = new QueuedServer();
         ComputeServer stub =
             (ComputeServer) UnicastRemoteObject.exportObject(queuedServer, 0);
-        Registry registry = LocateRegistry.createRegistry(RMIPORT);
-        registry.rebind(RMINAME, stub);
+        Registry registry = LocateRegistry.createRegistry(rmiPort);
+        registry.rebind(rmiName, stub);
         System.out.println("Group 2 Queued Server bound");
       } catch (Exception e) {
         System.out.println("Group 2 Queued Server exception");
