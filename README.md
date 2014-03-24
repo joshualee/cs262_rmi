@@ -12,18 +12,26 @@ Authors
 
 Usage
 -----------------
-####WorkQueue:
+####WorkQueue
 
-	java -Djava.security.policy=server.policy -Djava.rmi.server.codebase=http://example.com/rmi262.jar -Djava.rmi.server.useCodebaseOnly=false -classpath <path>workerServer.QueuedServer rmiPort rmiName
+	java -Djava.security.policy=server.policy 
+	-Djava.rmi.server.codebase=http://example.com/rmi262.jar 
+	-Djava.rmi.server.useCodebaseOnly=false 
+	-classpath <path>
+	workerServer.QueuedServer rmiPort rmiName
 
-####ComputeServer:
+####ComputeServer
 
-	 java -Djava.security.policy=server.policy 
-	 -Djava.rmi.server.codebase=http://example.com/rmi262.jar 
-	 -Djava.rmi.server.useCodebaseOnly=false 
-	 -classpath <path> workerServer.
-	 WorkerServer rmiHost rmiPort rmiName
+	java -Djava.security.policy=server.policy 
+	-Djava.rmi.server.codebase=http://example.com/rmi262.jar 
+	-Djava.rmi.server.useCodebaseOnly=false 
+	-classpath <path> workerServer.
+	WorkerServer rmiHost rmiPort rmiName
 
-####Client:
+####Client
 
-	java -Djava.security.policy=client.policy -Djava.rmi.server.codebase=http://example.com/rmi262.jar -Djava.rmi.server.useCodebaseOnly=false -classpath <path> client.SimpleClient rmiHost rmiPort rmiName
+	java -Djava.security.policy=client.policy
+	-Djava.rmi.server.codebase=http://example.com/rmi262.jar 
+	-Djava.rmi.server.useCodebaseOnly=false 
+	-classpath <path> 
+	client.SimpleClient rmiHost rmiPort rmiName
