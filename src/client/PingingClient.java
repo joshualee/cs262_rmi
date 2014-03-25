@@ -11,7 +11,9 @@ import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 
 /**
- * A PingingClient
+ * Takes in a {@link edu.harvard.cs262.ComputeServer.WorkTask} and a {@link edu.harvard.cs262.ComputeServer.ComputeServer}
+ * and using a {@link client.PingingWorkAttempter} to attempt to get the work done by the server.
+ * If it succeeds, it prints the result. If server fails ping, it prints work failed.
  */
 public class PingingClient {
   private static final int VERBOSE = 1;
@@ -21,13 +23,22 @@ public class PingingClient {
   private final int MAXATTEMPTS = 3;
   private final int PINGTIMEOUT = 3;
 
-
+  /**
+   * Constructor for PingingClient
+   * @param work The WorkTask to send to server
+   * @param server The ComputeServer that will either do the work, or distribute to worker
+   */
   public PingingClient(WorkTask work, ComputeServer server) {
     this.work = work;
     this.server = server;
     this.workAttempter = new PingingWorkAttempter();
   }
 
+  /**
+   * Attempt to get the answer
+   * @return The answer
+   * @throws WorkFailedException If server fails ping
+   */
   public Object getAnswer() throws WorkFailedException {
     return workAttempter.attemptWork(server, work, MAXATTEMPTS, PINGTIMEOUT);
   }
@@ -46,7 +57,7 @@ public class PingingClient {
     rmiHost = args[0];
     rmiPort = Integer.parseInt(args[1]);
     rmiName = args[2];
-    
+
     // Ensure it is safe to download remote security definitions with Security
     // Manager
     if (System.getSecurityManager() == null) {

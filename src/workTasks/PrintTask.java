@@ -6,7 +6,8 @@ import java.io.File;
 import java.io.Serializable;
 import java.util.Scanner;
 /**
- * Created by perry on 3/16/14.
+ * Has the Worker print something to their stdout, then returns "I printed this: "
+ * followed by what it printed.
  */
 public class PrintTask implements WorkTask, Serializable {
   private String str;

@@ -9,10 +9,14 @@ import java.rmi.RemoteException;
 import java.util.concurrent.*;
 
 /**
- * Created by perry on 3/16/14.
+ * Encapsulates the logic behind attempting to get work done, while continuously pinging to
+ * make sure that the worked is still responding.
  */
 public class PingingWorkAttempter implements WorkAttempter {
 
+  /**
+   * Callable that pings the worker once.
+   */
   private class PingTask implements Callable<Boolean> {
 
     private ComputeServer server;
@@ -27,6 +31,9 @@ public class PingingWorkAttempter implements WorkAttempter {
 
   }
 
+  /**
+   * Callable that sends the WorkTask to the worker.
+   */
   private class WorkTaskWrapper implements Callable<Object> {
 
     private ComputeServer server;
@@ -43,6 +50,10 @@ public class PingingWorkAttempter implements WorkAttempter {
   }
 
   @Override
+  /**
+   * Attempts to get the WorkTask performed by the worker. If they fail to respond to ping in time
+   * more than maxAttempts times, throws a WorkFailed exception.
+   */
   public Object attemptWork(ComputeServer worker, WorkTask work, int maxAttempts, int pingTimeout) throws WorkFailedException {
     Future<Boolean> pingFuture;
 
