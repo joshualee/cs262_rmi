@@ -8,17 +8,17 @@ import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
 import java.rmi.RemoteException;
+import java.util.UUID;
 
 /**
  * The {@link ComputeServer} implementation that does the work sent to it on its
  * own machine.
  */
 public class WorkerServer implements ComputeServer {
-  public static int VERBOSE = 1; 
-  
+  public static int VERBOSE = 1;
+
   /**
    * See {@link edu.harvard.cs262.ComputeServer.ComputeServer#sendWork(WorkTask)}.
-   * 
    * @param work the {@link WorkTask} object to be executed via doWork 
    * @return the result of the doWork call on work
    * @throws RemoteException
@@ -31,12 +31,13 @@ public class WorkerServer implements ComputeServer {
     }
     return result;
   }
-  
-  /** 
-   * See {@link edu.harvard.cs262.ComputeServer.ComputeServer#PingServer()}.
-   * 
-   * @return true if the server is still responding 
+
+  /**
+   * Pings the server.
+   *
+   * @return true if the server is still responding
    * @throws RemoteException
+   * @see edu.harvard.cs262.ComputeServer.ComputeServer#PingServer()
    */
   @Override
   public boolean PingServer() throws RemoteException {
@@ -70,8 +71,12 @@ public class WorkerServer implements ComputeServer {
       Registry registry = LocateRegistry.getRegistry(rmiHost, rmiPort);
       WorkQueue queueServer = (WorkQueue) registry.lookup(rmiName);
       ComputeServer workerServer = new WorkerServer();
-      queueServer.registerWorker((ComputeServer)
+      UUID id = queueServer.registerWorker((ComputeServer)
     		  UnicastRemoteObject.exportObject(workerServer, 0));
+      
+      if (VERBOSE > 0) {
+    	  System.out.println("Successfully registered with UUID" + id);
+      }
     } catch (Exception e) {
       System.err.println("Worker Server exception:");
       e.printStackTrace();

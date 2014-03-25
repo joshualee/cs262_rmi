@@ -2,6 +2,7 @@ package client;
 
 import edu.harvard.cs262.ComputeServer.ComputeServer;
 import securityManagers.DumbSecurityManager;
+import workTasks.PrintTask;
 import workTasks.SleepTask;
 
 import java.rmi.registry.LocateRegistry;
@@ -13,7 +14,7 @@ public class SimpleClient {
 		int rmiPort;
 		String rmiHost, rmiName;
 		SleepTask sleepTask1 = new SleepTask(1);
-		Integer returnVal;
+		Object returnVal;
 
 		if (args.length != 3) {
 			System.err.println("usage: java SimpleClient host port rminame");
@@ -32,7 +33,7 @@ public class SimpleClient {
         ComputeServer server = (ComputeServer) registry.lookup(rmiName);
 
         // make some tasks
-        returnVal = (Integer) server.sendWork(sleepTask1);
+        returnVal = server.sendWork(sleepTask1);
 
         System.out.println(returnVal);
 
