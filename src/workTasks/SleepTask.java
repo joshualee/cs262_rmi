@@ -21,7 +21,12 @@ public class SleepTask implements WorkTask, Serializable {
   public SleepTask(int sleepSeconds) {
 	  this.sleepSeconds = sleepSeconds;
   }
-
+  
+  /**
+   * A test doWork function that sleeps and returns a number.
+   *
+   * @return the integer result 1337 that signals success
+   */
   @Override
   public Object doWork() {
     try {
